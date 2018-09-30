@@ -47,17 +47,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     var yesCount: Double = 1
     /// Counter for nos
     var noCount: Double = 0
+    var iCanAct: Bool = true
 //    var noCountWeight: Double = 1 // set in preferences to desired weight i.e. 1.5 or 2
 //    var noCount: Double = noCountWeight
     var clickHereClickCount = 0
     var percentNumber = 100
     let blueHue = CGFloat(0.57)
     let greenHue = CGFloat(0.38)
-    var desiredTimerInterval: Double = 3
+    let desiredTimerIntervalWeight = 1.2
+    let DEFAULTdesiredTimerInterval: Double = 4 // 180 for 3 minutes
+    var desiredTimerInterval: Double = 4
     var notificationTitle: String? = nil
     var notificationSubtitle: String? = nil
     var notificationInformativeText: String? = nil
     var notificationSoundName: String? = nil
+    var timmy: Timer? = nil
 
     
     ///////////////////////////////////////////////////////////////////////////
@@ -78,7 +82,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         incrementNo()
     }
     @IBAction func doneMenuItemSelected(_ sender: Any) {
-        percentNumber = Int(100 / ((yesCount + noCount) / yesCount))
+        percentNumber = percentInt()
 
         notifyUser(title: "Well done!", informativeText: "You were " + String(percentNumber) + "% focused", soundName: NSUserNotificationDefaultSoundName)
 
@@ -106,10 +110,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         
         pieChartViewer.animate(xAxisDuration: 1, yAxisDuration: 0.5)
         pieChartViewer.data = chartData
+
+        stopTimer()
+        /// Prevents user clicking on notification changing data
+        iCanAct = false
     }
     @IBAction func restartMenuItemSelected(_ sender: Any) {
+        setStartTime()
         resetENV()
         updateChartData()
+        startTimer()
     }
 
     func resetENV() {
@@ -117,6 +127,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         yesCount = 1
         dataYes.value = yesCount
         dataNo.value = noCount
+        desiredTimerInterval = DEFAULTdesiredTimerInterval
         
         notificationTitle = nil
         notificationSubtitle = nil
@@ -124,18 +135,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         notificationSoundName = nil
     }
     
-    func boolSet(_ arrayOfLabels: NSTextField..., bool: Bool) {
+    func setBoolValue(_ arrayOfLabels: NSTextField..., boolValue: Bool) {
         for label in arrayOfLabels {
-            label.isHidden = bool
+            label.isHidden = boolValue
         }
     }
     
     /// Toggles extra info
     func infoHideShow() {
         if (clickHereClickCount % 2) == 0 {
-            boolSet(infoPercent, infoResponses, infoStart, bool: true)
+            setBoolValue(infoPercent, infoResponses, infoStart, boolValue: true)
         } else {
-            boolSet(infoPercent, infoResponses, infoStart, bool: false)
+            setBoolValue(infoPercent, infoResponses, infoStart, boolValue: false)
         }
         
 //        if (clickHereClickCount % 2) == 0 {
@@ -159,10 +170,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         infoHideShow()
     }
     
+    func percentInt() -> Int {
+        return Int(100 / ((yesCount + noCount) / yesCount))
+    }
+    
     /// Updates pie chart
     func updateChartData() {
         let totalCount = Int(yesCount + noCount)
-        percentNumber = Int(100 / ((yesCount + noCount) / yesCount))
+        percentNumber = percentInt()
         
 //        var changingYesColor = CGFloat(Float(percentNumber + 800) / 1500)
         
@@ -183,10 +198,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         pieChartViewer.data = chartData
         
         /// Update info
-        print(percentNumber)
-        print(totalCount)
-        print(yesCount)
-        print(noCount)
         infoPercent.stringValue = String(percentNumber) + "%"
 //        infoPercent.toolTip = String(percentNumber) + "%"
         /// Display fraction; alternate to percent
@@ -220,15 +231,32 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     func incrementYes() {
         yesCount += 1
         dataYes.value = yesCount
+        incrementDesiredTimerInterval()
         updateChartData()
     }
     
     func incrementNo() {
         noCount += 1
         dataNo.value = noCount
+        decrementDesiredTimerInterval()
         updateChartData()
     }
 
+    func incrementDesiredTimerInterval() {
+        desiredTimerInterval *= desiredTimerIntervalWeight
+        print(desiredTimerInterval)
+        stopTimer()
+        startTimer()
+    }
+
+    func decrementDesiredTimerInterval() {
+        desiredTimerInterval /= desiredTimerIntervalWeight
+        print(desiredTimerInterval)
+        stopTimer()
+        startTimer()
+    }
+
+    
     func setStartTime() {
         let formatter = DateFormatter()
         formatter.timeStyle = .medium
@@ -259,10 +287,11 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
      - 80% you're doing well; 60% focus; 20% what the $&*@# are you doing?!
      */
     func notifyUser(title: String = "Are you on task?", subtitle: String = "", informativeText: String = "I only ask because you wanted me to check on you.", soundName: String = "Purr") {
-        /// REMOVED @objc preface
+        /// REMOVED @objc preface to func
         let notificationUniqueID = NSUUID().uuidString
         let customNotification = NSUserNotification()
         let noteCenter = NSUserNotificationCenter.default
+        iCanAct = true
         
         /// Build notification
         customNotification.identifier = notificationUniqueID
@@ -282,12 +311,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
 //        customNotification.otherButtonTitle = "oB"
         // Displays image in on right
 //        customNotification.contentImage = NSImage(named: NSImage.Name(rawValue:"AppIcon")) // set to Thumbs up
+        // if less than 50% add Caution sign!
+        if percentInt() < 50 {
+            customNotification.contentImage = NSImage(named: NSImage.Name(rawValue: "NSCaution"))
+        }
         // Displays image in place of icon (on left), icon is then shifted up by app name
 //        customNotification.setValue(NSImage(named: NSImage.Name(rawValue:"AppIcon")), forKey: "_identityImage")
 
         /// Send notification to Notification Center
         noteCenter.delegate = self
         noteCenter.deliver(customNotification)
+        
+        /// We increment yes every time a notification is delivered
+        /// but if said notification is clicked we decrement yes and increment no
+        incrementYes()
         
         /// Tells the dev the notification was sent
         print("Notification sent!\n")
@@ -300,11 +337,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     
     /// Notification actions
     func userNotificationCenter(_ center: NSUserNotificationCenter, didActivate notification: NSUserNotification) {
+        // build in protection against multiple clicks // DONE
+        // This is triggered if the user clicks the notification
         print("activationType: ", terminator: "")
         print(notification.activationType.rawValue)
-        // 1 is whole thing
-        // 2 is action button
-        // no response is other button/close or hopefully swipe away
+        if iCanAct == true && notification.activationType.rawValue == 1 {
+            yesCount -= 1
+            dataYes.value = yesCount
+            decrementDesiredTimerInterval()
+            incrementNo()
+            iCanAct = false
+        }
     }
 
     func mainSetUp() {
@@ -314,19 +357,21 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         clickHereButton.alphaValue = 0.5
     }
     
-    func startTimer() {
-//        change this, make a custom loop that goes every so many minutes/seconds
-//        this is fine for testing
-//            Timer.scheduledTimer(
-//                timeInterval: desiredTimerInterval,
-//                target: self,
-//                selector: #selector(notifyUser()),
-//                userInfo: nil,
-//                repeats: true)
-        Timer.scheduledTimer(withTimeInterval: desiredTimerInterval, repeats: true) { Timer in
-            self.notifyUser()
+    func stopTimer() {
+        if timmy != nil {
+            timmy?.invalidate()
+            timmy = nil
         }
     }
+    
+    func startTimer() {
+        if timmy == nil {
+            timmy = Timer.scheduledTimer(withTimeInterval: desiredTimerInterval, repeats: true) { Timer in
+                self.notifyUser()
+            }
+        }
+    }
+
     
     ///////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////
