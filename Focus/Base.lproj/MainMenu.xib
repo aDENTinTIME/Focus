@@ -23,8 +23,9 @@
                 <outlet property="infoStart" destination="Eun-9U-nGn" id="RP9-m2-445"/>
                 <outlet property="informationTextField" destination="cfC-9g-EIR" id="MXL-9M-stv"/>
                 <outlet property="intervalInMinutesTextField" destination="tYd-Ma-DZE" id="TZR-wJ-xSf"/>
-                <outlet property="messageEnabled" destination="DHl-X2-ium" id="Hw1-i4-ksN"/>
                 <outlet property="onOffNotificationSound" destination="U4b-1U-Zuj" id="XAe-Sw-KaV"/>
+                <outlet property="outputText" destination="oRZ-ZM-Lnm" id="ujF-Rw-PMe"/>
+                <outlet property="outputView" destination="DHl-X2-ium" id="04H-k3-bSD"/>
                 <outlet property="passTextField" destination="2Rb-vc-5he" id="QBB-6x-UVp"/>
                 <outlet property="pieChartViewer" destination="5XZ-Zj-Zb7" id="Y0r-8C-i1x"/>
                 <outlet property="preferencesWindow" destination="Jbg-DJ-1vW" id="IBO-3P-tbu"/>
@@ -389,9 +390,6 @@
                             <menuItem isSeparatorItem="YES" id="CxF-wG-Pap"/>
                             <menuItem title="Pause/Resume" hidden="YES" keyEquivalent="p" id="f53-Tv-9fX">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES"/>
-                                <connections>
-                                    <action selector="pauseResumeMenuItemSelected:" target="Voe-Tx-rLC" id="7qk-af-LMV"/>
-                                </connections>
                             </menuItem>
                             <menuItem title="Done" keyEquivalent="d" id="clL-XB-8Xp">
                                 <connections>
@@ -810,17 +808,17 @@
         <menuItem title="Item" id="1KR-qd-1HL">
             <modifierMask key="keyEquivalentModifierMask"/>
         </menuItem>
-        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="Jbg-DJ-1vW" customClass="NSPanel">
+        <window title="Window" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" hidesOnDeactivate="YES" oneShot="NO" releasedWhenClosed="NO" showsToolbarButton="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" titlebarAppearsTransparent="YES" titleVisibility="hidden" id="Jbg-DJ-1vW" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" utility="YES" HUD="YES" fullSizeContentView="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="850" y="550" width="425" height="265"/>
+            <rect key="contentRect" x="850" y="550" width="425" height="294"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="900"/>
             <view key="contentView" id="62b-Cu-3n0">
-                <rect key="frame" x="0.0" y="0.0" width="425" height="265"/>
+                <rect key="frame" x="0.0" y="0.0" width="425" height="294"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Mey-lP-x69">
-                        <rect key="frame" x="175" y="10" width="75" height="19"/>
+                        <rect key="frame" x="175" y="12" width="75" height="19"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="roundTextured" title="save" bezelStyle="texturedRounded" alignment="center" controlSize="small" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="ZaI-Yn-kPk">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -831,7 +829,7 @@
                         </connections>
                     </button>
                     <box fixedFrame="YES" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="IHd-jq-QUd">
-                        <rect key="frame" x="17" y="132" width="391" height="115"/>
+                        <rect key="frame" x="17" y="161" width="391" height="115"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" ambiguous="YES" id="gbV-KU-TKQ">
                             <rect key="frame" x="2" y="2" width="387" height="111"/>
@@ -852,7 +850,7 @@
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Subtitle" drawsBackground="YES" id="dW7-1V-8cv">
                                         <font key="font" metaFont="system" size="14"/>
                                         <color key="textColor" name="alternateSelectedControlTextColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="onePercentFromClearColor"/>
+                                        <color key="backgroundColor" name="onePointFivePercentFromClearColor"/>
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="boH-75-kL9">
@@ -861,7 +859,7 @@
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Title" drawsBackground="YES" id="uMT-tq-0Ju">
                                         <font key="font" metaFont="system" size="14"/>
                                         <color key="textColor" name="alternateSelectedControlTextColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="onePercentFromClearColor"/>
+                                        <color key="backgroundColor" name="onePointFivePercentFromClearColor"/>
                                     </textFieldCell>
                                 </textField>
                                 <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ccg-1s-67c">
@@ -870,7 +868,7 @@
                                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="right" title="Information" drawsBackground="YES" id="L9b-cN-HHj">
                                         <font key="font" metaFont="system" size="14"/>
                                         <color key="textColor" name="alternateSelectedControlTextColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="onePercentFromClearColor"/>
+                                        <color key="backgroundColor" name="onePointFivePercentFromClearColor"/>
                                     </textFieldCell>
                                 </textField>
                                 <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cfC-9g-EIR">
@@ -939,12 +937,15 @@
                                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                         <font key="font" metaFont="cellTitle"/>
                                     </buttonCell>
+                                    <connections>
+                                        <action selector="previewButtonSelected:" target="Voe-Tx-rLC" id="xfq-RA-ah7"/>
+                                    </connections>
                                 </button>
                             </subviews>
                         </view>
                     </box>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Dit-9W-Mz0">
-                        <rect key="frame" x="31" y="98" width="141" height="25"/>
+                        <rect key="frame" x="31" y="127" width="141" height="25"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Notification Interval" drawsBackground="YES" id="tPf-a2-PHv">
                             <font key="font" metaFont="system" size="14"/>
@@ -953,7 +954,7 @@
                         </textFieldCell>
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BAB-IJ-92c">
-                        <rect key="frame" x="212" y="98" width="70" height="25"/>
+                        <rect key="frame" x="212" y="127" width="70" height="25"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="minutes" drawsBackground="YES" id="bea-AL-By6">
                             <font key="font" metaFont="system" size="14"/>
@@ -962,7 +963,7 @@
                         </textFieldCell>
                     </textField>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tYd-Ma-DZE">
-                        <rect key="frame" x="175" y="103" width="35" height="22"/>
+                        <rect key="frame" x="175" y="132" width="35" height="22"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" alignment="right" placeholderString="4.2" drawsBackground="YES" id="sb9-hC-efy">
                             <font key="font" metaFont="system"/>
@@ -971,7 +972,7 @@
                         </textFieldCell>
                     </textField>
                     <box hidden="YES" fixedFrame="YES" boxType="custom" cornerRadius="4" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="AIl-T8-JBl">
-                        <rect key="frame" x="275" y="99" width="104" height="30"/>
+                        <rect key="frame" x="275" y="128" width="104" height="30"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <view key="contentView" ambiguous="YES" id="AbK-PU-yYL">
                             <rect key="frame" x="1" y="1" width="102" height="28"/>
@@ -993,11 +994,11 @@
                                 </textField>
                             </subviews>
                         </view>
-                        <color key="borderColor" name="onePercentFromClearColor"/>
+                        <color key="borderColor" name="pointFivePercentFromClearColor"/>
                         <color key="fillColor" red="0.98111641839999997" green="0.83590406449999999" blue="0.62909970559999995" alpha="0.24691901408450703" colorSpace="custom" customColorSpace="sRGB"/>
                     </box>
                     <button hidden="YES" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IXl-8h-3Dk">
-                        <rect key="frame" x="275" y="98" width="104" height="31"/>
+                        <rect key="frame" x="275" y="127" width="104" height="31"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="ZFh-iR-FCO">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1008,7 +1009,7 @@
                         </connections>
                     </button>
                     <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="U4b-1U-Zuj">
-                        <rect key="frame" x="175" y="71" width="75" height="20"/>
+                        <rect key="frame" x="175" y="100" width="75" height="20"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <segmentedCell key="cell" borderStyle="border" alignment="left" style="roundRect" trackingMode="selectOne" id="fpW-FH-qEM">
                             <font key="font" metaFont="cellTitle"/>
@@ -1022,7 +1023,7 @@
                         </connections>
                     </segmentedControl>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vun-Uy-HWD">
-                        <rect key="frame" x="31" y="68" width="141" height="25"/>
+                        <rect key="frame" x="31" y="97" width="141" height="25"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Notification Sound" drawsBackground="YES" id="SxR-s0-TVi">
                             <font key="font" metaFont="system" size="14"/>
@@ -1030,20 +1031,40 @@
                             <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0050000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
                         </textFieldCell>
                     </textField>
-                    <box hidden="YES" fixedFrame="YES" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="DHl-X2-ium">
-                        <rect key="frame" x="-3" y="-4" width="431" height="271"/>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rnd-oj-iqu" userLabel="Restore Defaults">
+                        <rect key="frame" x="31" y="67" width="141" height="25"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Restore Defaults" drawsBackground="YES" id="QKS-Od-vUy" userLabel="Restore Defaults">
+                            <font key="font" metaFont="system" size="14"/>
+                            <color key="textColor" name="alternateSelectedControlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.0050000000000000001" colorSpace="custom" customColorSpace="sRGB"/>
+                        </textFieldCell>
+                    </textField>
+                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="r16-PV-ihd">
+                        <rect key="frame" x="175" y="71" width="17" height="17"/>
                         <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="bevel" bezelStyle="rounded" image="NSRefreshFreestandingTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyDown" inset="2" id="9Nt-56-Kp5">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="restoreDefaultsButtonSelected:" target="Voe-Tx-rLC" id="TnO-qy-U5N"/>
+                        </connections>
+                    </button>
+                    <box hidden="YES" fixedFrame="YES" title="Box" titlePosition="noTitle" translatesAutoresizingMaskIntoConstraints="NO" id="DHl-X2-ium">
+                        <rect key="frame" x="-3" y="-4" width="431" height="300"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
                         <view key="contentView" ambiguous="YES" id="HvF-V7-xts">
-                            <rect key="frame" x="2" y="2" width="427" height="267"/>
+                            <rect key="frame" x="2" y="2" width="427" height="296"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZCT-Dq-QqG">
-                                    <rect key="frame" x="119" y="122" width="189" height="24"/>
-                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="ju_mode enabled" drawsBackground="YES" id="gB1-F3-Cb3">
+                                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oRZ-ZM-Lnm" userLabel="Output Label">
+                                    <rect key="frame" x="20" y="22" width="387" height="159"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
+                                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="center" drawsBackground="YES" id="eb3-hi-vpg">
                                         <font key="font" metaFont="system" size="18"/>
                                         <color key="textColor" name="alternateSelectedControlTextColor" catalog="System" colorSpace="catalog"/>
-                                        <color key="backgroundColor" name="onePercentFromClearColor"/>
+                                        <color key="backgroundColor" name="onePointFivePercentFromClearColor"/>
                                     </textFieldCell>
                                 </textField>
                             </subviews>
@@ -1051,25 +1072,23 @@
                     </box>
                 </subviews>
             </view>
-            <point key="canvasLocation" x="640.5" y="351.5"/>
+            <point key="canvasLocation" x="701" y="368"/>
         </window>
     </objects>
     <resources>
         <image name="NSCaution" width="32" height="32"/>
+        <image name="NSRefreshFreestandingTemplate" width="14" height="14"/>
         <namedColor name="onePercentFromClearColor">
             <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="onePercentFromClearColor">
-            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="onePointFivePercentFromClearColor">
+            <color red="1" green="1" blue="1" alpha="0.014999999664723873" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="onePercentFromClearColor">
-            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="onePointFivePercentFromClearColor">
+            <color red="1" green="1" blue="1" alpha="0.014999999664723873" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
-        <namedColor name="onePercentFromClearColor">
-            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="onePercentFromClearColor">
-            <color red="1" green="1" blue="1" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
+        <namedColor name="pointFivePercentFromClearColor">
+            <color red="1" green="1" blue="1" alpha="0.0099999997764825821" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>
 </document>

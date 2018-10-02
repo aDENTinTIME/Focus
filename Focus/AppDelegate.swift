@@ -42,6 +42,87 @@ import Charts
 // ⌘R Restart
 
 
+/*
+ examples and code from https://stackoverflow.com/questions/24092884/get-nth-character-of-a-string-in-swift-programming-language/38215613#38215613
+ 
+ let str = "abcde"
+ print(type(of: str))
+ print(str[1])     // => b
+ print(str[1..<3]) // => bc
+ print(str[1...3]) // => bcd
+ print(str[1...])  // => bcde
+ print(str[...3])  // => abcd
+ print(str[..<3])  // => abc
+ print("")
+ 
+ // With substrings:
+ let sub = str[0...]
+ print(type(of: sub))
+ print(sub[1])     // => b
+ print(sub[1..<3]) // => bc
+ print(sub[1...3]) // => bcd
+ print(sub[1...])  // => bcde
+ print(sub[...3])  // => abcd
+ print(sub[..<3])  // => abc
+ */
+
+//extension String {
+//    subscript (i: Int) -> Character {
+//        return self[index(startIndex, offsetBy: i)]
+//    }
+//    subscript (bounds: CountableRange<Int>) -> Substring {
+//        let start = index(startIndex, offsetBy: bounds.lowerBound)
+//        let end = index(startIndex, offsetBy: bounds.upperBound)
+//        return self[start ..< end]
+//    }
+//    subscript (bounds: CountableClosedRange<Int>) -> Substring {
+//        let start = index(startIndex, offsetBy: bounds.lowerBound)
+//        let end = index(startIndex, offsetBy: bounds.upperBound)
+//        return self[start ... end]
+//    }
+//    subscript (bounds: CountablePartialRangeFrom<Int>) -> Substring {
+//        let start = index(startIndex, offsetBy: bounds.lowerBound)
+//        let end = index(endIndex, offsetBy: -1)
+//        return self[start ... end]
+//    }
+//    subscript (bounds: PartialRangeThrough<Int>) -> Substring {
+//        let end = index(startIndex, offsetBy: bounds.upperBound)
+//        return self[startIndex ... end]
+//    }
+//    subscript (bounds: PartialRangeUpTo<Int>) -> Substring {
+//        let end = index(startIndex, offsetBy: bounds.upperBound)
+//        return self[startIndex ..< end]
+//    }
+//}
+//extension Substring {
+//    subscript (i: Int) -> Character {
+//        return self[index(startIndex, offsetBy: i)]
+//    }
+//    subscript (bounds: CountableRange<Int>) -> Substring {
+//        let start = index(startIndex, offsetBy: bounds.lowerBound)
+//        let end = index(startIndex, offsetBy: bounds.upperBound)
+//        return self[start ..< end]
+//    }
+//    subscript (bounds: CountableClosedRange<Int>) -> Substring {
+//        let start = index(startIndex, offsetBy: bounds.lowerBound)
+//        let end = index(startIndex, offsetBy: bounds.upperBound)
+//        return self[start ... end]
+//    }
+//    subscript (bounds: CountablePartialRangeFrom<Int>) -> Substring {
+//        let start = index(startIndex, offsetBy: bounds.lowerBound)
+//        let end = index(endIndex, offsetBy: -1)
+//        return self[start ... end]
+//    }
+//    subscript (bounds: PartialRangeThrough<Int>) -> Substring {
+//        let end = index(startIndex, offsetBy: bounds.upperBound)
+//        return self[startIndex ... end]
+//    }
+//    subscript (bounds: PartialRangeUpTo<Int>) -> Substring {
+//        let end = index(startIndex, offsetBy: bounds.upperBound)
+//        return self[startIndex ..< end]
+//    }
+//}
+
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDelegate {
@@ -60,7 +141,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     @IBOutlet weak var titleLabel: NSTextField!
     @IBOutlet weak var userPassTabView: NSTabView!
     @IBOutlet weak var passTextField: NSSecureTextField!
-    @IBOutlet weak var messageEnabled: NSView!
+    @IBOutlet weak var outputView: NSView!
+    @IBOutlet weak var outputText: NSTextField!
     
     @IBOutlet weak var window: NSWindow!
     @IBOutlet weak var pieChartViewer: PieChartView!
@@ -93,11 +175,17 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     var notificationSoundName: String? = "Purr"
     var timmy: Timer? = nil
     var doneImage = false
-    var userPassAuthenticated = false
-    var userAuthenticated = false
-    var ju_mode = false
-
     
+    let DEV_USERNAME = "root"
+    let DEV_PASSWORD = "root"
+    var userAuthenticated = false
+    var passwordAuthenticated = false
+    var ju_mode = false
+    var holberton_mode = false
+    var overrideTimeConstraintDisabled = true
+    var lastOutputText = ""
+
+
     
 //   /$$      /$$ /$$$$$$$$ /$$   /$$ /$$   /$$
 //  | $$$    /$$$| $$_____/| $$$ | $$| $$  | $$
@@ -111,6 +199,13 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
 
     @IBAction func preferencesMenuItemSelected(_ sender: Any) {
         preferencesWindow.setIsVisible(true)
+        
+        /// I do this, one: to show that this window is the preferences
+        /// and two: because this solves a bug with the background of
+        /// the textfield being slightly off color if you echo an empty
+        /// string/space.
+        presentOutput("Preferences", 0.5)
+        lastOutputText = ""
     }
     @IBAction func yesMenuItemSelected(_ sender: Any) {
         incrementYes()
@@ -183,49 +278,132 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
 
     
     
+    func presentOutput(_ text: String, _ DISPLAY_TIME: Double = 1, _ desiredAlignment: NSTextAlignment = .center) {
+        outputText.alignment = desiredAlignment
+        lastOutputText = text
+        outputText.stringValue = text
+        outputView.isHidden = false
+        titleTextField.isEnabled = false
+        Timer.scheduledTimer(withTimeInterval: DISPLAY_TIME, repeats: false) { Timer in
+            self.outputView.isHidden = true
+            self.titleTextField.isEnabled = true
+            self.titleTextField.becomeFirstResponder()
+        }
+        //            messageEnabled.acceptsFirstMouse // capture click and hide output
+    }
+
+    func exitCommand() {
+        /// I want to hook this into the preferences window closing
+        passTextField.stringValue = ""
+        titleTextField.stringValue = ""
+        titleLabel.stringValue = "Title"
+        userPassTabView.selectTabViewItem(at: 0)
+        passwordAuthenticated = false
+    }
+    
+    func executeCommands() {
+        let command = titleTextField.stringValue
+        
+        titleTextField.stringValue = ""
+        passTextField.stringValue = ""
+        titleLabel.stringValue = "Command"
+
+        if command == "exit" {
+            exitCommand()
+        } else if command == "ju" {
+            if ju_mode {
+                ju_mode = false
+                print("Ju_mode disabled")
+                presentOutput("Ju_mode disabled")
+            } else {
+                ju_mode = true
+                print("Ju_mode enabled")
+                presentOutput("Ju_mode enabled")
+            }
+        } else if command == "holberton" {
+            if holberton_mode {
+                holberton_mode = false
+                print("Holberton_mode disabled")
+                presentOutput("Holberton_mode disabled")
+            } else {
+                holberton_mode = true
+                print("Holberton_mode enabled")
+                presentOutput("Holberton_mode enabled")
+            }
+        } else if command == "fidget" {
+            if window.isMovableByWindowBackground {
+                pieChartViewer.dragDecelerationFrictionCoef = 0.9
+                pieChartViewer.rotationEnabled = true
+                window.isMovableByWindowBackground = false
+                print("Fidget spinner enabled")
+                presentOutput("Fidget spinner enabled")
+            } else {
+                pieChartViewer.rotationEnabled = false
+                window.isMovableByWindowBackground = true
+                print("Fidget spinner disabled")
+                presentOutput("Fidget spinner disabled")
+            }
+        } else if command == "otc" {
+            /// override time constraints
+            if overrideTimeConstraintDisabled {
+                overrideTimeConstraintDisabled = false
+                print("Time constraints disabled")
+                presentOutput("Time constraints disabled")
+            } else {
+                overrideTimeConstraintDisabled = true
+                print("Time constraints enabled")
+                presentOutput("Time constraints enabled")
+            }
+        } else if command == "last" {
+            presentOutput(lastOutputText, 2)
+        } else if command == "commands" {
+            ju_mode = false
+            presentOutput("commands;  ju;  holberton;\necho;  echo $$;  exit", 4)
+        } else if command.starts(with: "echo") {
+            if command == "echo" || command == "echo " {
+                presentOutput("")
+            } else {
+                let start = String.Index.init(encodedOffset: 5)
+                let end = command.index(command.endIndex, offsetBy: -1)
+                let echoText = String(command[start...end])
+                
+                if echoText == "$$" {
+                    presentOutput(String(getpid()))
+                } else {
+                    presentOutput(echoText)
+                }
+            }
+            //                presentOutput(String(echoText[1...5]))
+        }
+
+    }
+    
+    func validatePassword() {
+        if passTextField.stringValue == DEV_PASSWORD {
+            passTextField.stringValue = ""
+            titleTextField.stringValue = ""
+            titleLabel.stringValue = "Command"
+            userPassTabView.selectTabViewItem(at: 0)
+            titleTextField.becomeFirstResponder()
+            passwordAuthenticated = true
+            userAuthenticated = false
+        } else {
+            passTextField.stringValue = ""
+            titleTextField.stringValue = ""
+            titleLabel.stringValue = "Title"
+            userPassTabView.selectTabViewItem(at: 0)
+            titleTextField.becomeFirstResponder()
+            userAuthenticated = false
+        }
+    }
+    
     @IBAction func titleTextFieldEntered(_ sender: Any) {
         /// DON'T FORGET TO RESET VALUES, OR MAYBE IT DON'T MATTER CAUSE IT'S ALL TITLE HMMM
-        
-        if userPassAuthenticated {
-            if titleTextField.stringValue == "ju_mode" {
-                titleTextField.stringValue = ""
-                messageEnabled.isHidden = false
-                titleTextField.isEnabled = false
-                Timer.scheduledTimer(withTimeInterval: 2, repeats: false) { Timer in
-                    self.messageEnabled.isHidden = true
-                    self.titleTextField.isEnabled = true
-                    self.titleTextField.becomeFirstResponder()
-                }
-//            messageEnabled.acceptsFirstMouse // capture click and hide ju_mode
-            ju_mode = true
-            print("ju_mode enabled")
-            } else if titleTextField.stringValue == "exit" {
-                passTextField.stringValue = ""
-                titleTextField.stringValue = ""
-                titleLabel.stringValue = "Title"
-                userPassTabView.selectTabViewItem(at: 0)
-                userPassAuthenticated = false
-            }
-        }
-        if userAuthenticated {
-            if passTextField.stringValue == "root" {
-                passTextField.stringValue = ""
-                titleTextField.stringValue = ""
-                titleLabel.stringValue = "Command"
-                userPassTabView.selectTabViewItem(at: 0)
-                titleTextField.becomeFirstResponder()
-                userPassAuthenticated = true
-                userAuthenticated = false
-            } else {
-                passTextField.stringValue = ""
-                titleTextField.stringValue = ""
-                titleLabel.stringValue = "Title"
-                userPassTabView.selectTabViewItem(at: 0)
-                titleTextField.becomeFirstResponder()
-                userAuthenticated = false
-            }
-        }
-        if titleTextField.stringValue == "root" {
+        if passwordAuthenticated {
+            executeCommands()
+        } else if userAuthenticated {
+            validatePassword()
+        } else if titleTextField.stringValue == DEV_USERNAME {
             titleLabel.stringValue = "Password"
             userPassTabView.selectTabViewItem(at: 1)
             passTextField.becomeFirstResponder()
@@ -252,6 +430,14 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
             }
         }
         return nil
+    }
+    
+    func optionalNotificationLeftImage() -> String {
+        if holberton_mode {
+            return "holberton_logo"
+        } else {
+            return ""
+        }
     }
     
     func optionalNotificationSound() -> String? {
@@ -307,6 +493,18 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         showWarningRequestedIntervalNotAllowed(false)
     }
     
+    @IBAction func restoreDefaultsButtonSelected(_ sender: Any) {
+        titleTextField.stringValue = "Are you on task?"
+        informationTextField.stringValue = "I only ask because you wanted me to check on you."
+        intervalInMinutesTextField.doubleValue = 4.2
+        onOffCount = 1
+        onOffNotificationSoundSelected(self)
+    }
+    
+    @IBAction func previewButtonSelected(_ sender: Any) {
+        iCanActMultiClickProtection = false
+        notifyUser(title: titleTextField!.stringValue, subtitle: subtitleTextField!.stringValue, informative: informationTextField!.stringValue)
+    }
     
     /// Retrieves data from text fields and sets appropriate variables
     @IBAction func preferencesSaveButtonSelected(_ sender: Any) {
@@ -315,15 +513,16 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         let interValue = intervalInMinutesTextField!.doubleValue
         
         // LOGIC yeah... SET VALUES DUDE wwoooooooottt YEeeeEEeeeEEEeEeeHAAAAAAAAAa
-        if interValue != 0.0 && interValue < THIRTY_SECONDS {
+        if overrideTimeConstraintDisabled && interValue != 0.0 && interValue < THIRTY_SECONDS {
             cautionTextField.stringValue = "Too Short"
+            warningIntervalTooShort.toolTip = "Studies have shown, using Focus with an interval less than thirty seconds, to be counterproductive, downright irritating in fact."
             showWarningRequestedIntervalNotAllowed(true)
-        } else if interValue > NINETY_MINUTES {
+        } else if overrideTimeConstraintDisabled && interValue > NINETY_MINUTES {
             cautionTextField.stringValue = "Too Long"
+            warningIntervalTooShort.toolTip = "Yeesh, how long ya think it's gonna take you??"
             showWarningRequestedIntervalNotAllowed(true)
         } else {
             showWarningRequestedIntervalNotAllowed(false)
-            preferencesWindow.setIsVisible(false)
             
             /// Clean up
             noCount = 0
@@ -334,8 +533,27 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
             notificationTitle = titleTextField!.stringValue
             notificationSubtitle = subtitleTextField!.stringValue
             notificationInformativeText = informationTextField!.stringValue
-
             desiredTimerInterval = interValue == 0.0 ? DEFAULTdesiredTimerInterval : interValue * 60
+
+            /// Present customized notification settings
+            outputText.alignment = NSTextAlignment.left
+            outputText.stringValue = "Title: " + notificationTitle + "\nSubtitle: " + notificationSubtitle + "\nInformation: " + notificationInformativeText + "\nInterval: " + String(Int(desiredTimerInterval / 60)) + " minutes and " + String(Int(desiredTimerInterval) % 60) + " seconds"
+            outputView.isHidden = false
+            titleTextField.isEnabled = false
+            subtitleTextField.isEnabled = false
+            informationTextField.isEnabled = false
+            intervalInMinutesTextField.isEnabled = false
+            Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { Timer in
+                self.preferencesWindow.setIsVisible(false)
+                
+                self.outputView.isHidden = true
+                self.titleTextField.isEnabled = true
+                self.subtitleTextField.isEnabled = true
+                self.informationTextField.isEnabled = true
+                self.intervalInMinutesTextField.isEnabled = true
+                self.titleTextField.becomeFirstResponder()
+                self.exitCommand()
+            }
             setStartTime()
             updateChartData()
             stopTimer()
@@ -438,6 +656,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         pieChartViewer.chartDescription?.text = ""
         /// Hides legend
         pieChartViewer.legend.enabled = false
+        /// Prevents chart from being draggable
+        pieChartViewer.rotationEnabled = false
         ///       Hides hole
         //        pieChart.drawHoleEnabled = false
         //        pieChart.usePercentValuesEnabled = true
@@ -512,7 +732,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         let notificationUniqueID = NSUUID().uuidString
         let customNotification = NSUserNotification()
         let noteCenter = NSUserNotificationCenter.default
-        iCanActMultiClickProtection = true
         
         /// Build notification
         customNotification.identifier = notificationUniqueID
@@ -531,6 +750,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
         // if less than 50% add Caution sign!
 
         customNotification.contentImage = optionalNotificationImage()
+        customNotification.setValue(NSImage(named: NSImage.Name(rawValue: optionalNotificationLeftImage())), forKey: "_identityImage")
         // Displays image in place of icon (on left), icon is then shifted up by app name
 //        customNotification.setValue(NSImage(named: NSImage.Name(rawValue:"AppIcon")), forKey: "_identityImage")
 
@@ -579,6 +799,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, NSUserNotificationCenterDele
     func startTimer() {
         if timmy == nil {
             timmy = Timer.scheduledTimer(withTimeInterval: desiredTimerInterval, repeats: true) { Timer in
+                self.iCanActMultiClickProtection = true
                 self.doneImage = false
                 self.notifyUser()
                 /// We increment yes every time a notification is delivered
